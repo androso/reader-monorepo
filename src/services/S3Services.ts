@@ -19,7 +19,7 @@ export class S3Service {
       forcePathStyle: false // Required for DigitalOcean Spaces
     });
   }
-
+  //retieve file from s3
   async downloadFile(key: string, localPath: string): Promise<boolean> {
     try {
       const response = await this.s3.getObject({

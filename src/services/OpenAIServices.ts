@@ -12,6 +12,7 @@ export class OpenAIService {
     });
   }
 
+  //generate response function to generate response from the model based on the context and query
   async generateResponse(context: string, query: string): Promise<string> {
     const response = await this.client.chat.completions.create({
       model: 'gpt-4',
