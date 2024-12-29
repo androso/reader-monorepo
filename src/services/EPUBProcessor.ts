@@ -12,7 +12,7 @@ import { unlink } from 'fs/promises';
 export class EPUBProcessor {
   // Define services
   private s3Service: S3Service;
-  private chromaService: ChromaService;
+  public chromaService: ChromaService;
   private openAIService: OpenAIService;
   private localFilePath: string;
 

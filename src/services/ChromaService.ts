@@ -116,4 +116,15 @@ export class ChromaService {
       nResults,
     });
   }
+  async deleteCollection(name: string): Promise<boolean> {
+    try {
+      await this.client.deleteCollection({ name });
+      this.collections.delete(name);
+      console.log(`Collection deleted: ${name}`);
+      return true;
+    } catch (error) {
+      console.error('Delete collection error:', error);
+      throw error;
+    }
+  }
 }

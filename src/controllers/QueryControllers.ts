@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import { ProcessQueryRequest, QueryResponse } from '../types';
 import { EPUBProcessor } from '../services/EPUBProcessor';
+import { DeleteCollectionResponse } from '../types';
 
 // Define QueryController class
 export class QueryController {
@@ -20,6 +21,32 @@ export class QueryController {
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: `Server error: ${error}` });
+    }
+  }
+
+  async handleDelete(req: Request, res: Response<DeleteCollectionResponse>) {
+    try {
+      const { collectionName } = req.params;
+      
+      if (!collectionName) {
+        res.status(400).json({ 
+          success: false, 
+          error: 'Collection name is required' 
+        });
+        return;
+      }
+  
+      await this.epubProcessor.chromaService.deleteCollection(collectionName);
+      
+      res.json({ 
+        success: true, 
+        message: `Collection ${collectionName} deleted successfully` 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   }
 }
