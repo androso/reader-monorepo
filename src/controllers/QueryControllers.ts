@@ -36,7 +36,7 @@ export class QueryController {
         return;
       }
   
-      await this.epubProcessor.chromaService.deleteCollection(collectionName);
+      await this.epubProcessor.deleteCollection(collectionName);
       
       res.json({ 
         success: true, 

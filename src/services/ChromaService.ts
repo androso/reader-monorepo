@@ -1,5 +1,7 @@
 import { ChromaClient, OpenAIEmbeddingFunction } from "chromadb";
 import dotenv from "dotenv";
+import { Worker } from "worker_threads";
+import path from "path";
 
 dotenv.config();
 
@@ -36,74 +38,114 @@ export class ChromaService {
 
   async getOrCreateCollection(name: string) {
     try {
-        let collection;
-        // First try to get existing collection
-        try {
-            collection = await this.client.getCollection({
-                name,
-                embeddingFunction: this.embeddingFunction,
-            });
-            console.log(`Found collection: ${name} with ID: ${collection.id}`);
-        } catch (error) {
-            collection = await this.client.createCollection({
-                name,
-                embeddingFunction: this.embeddingFunction,
-            });
-            console.log(`Created collection: ${name} with ID: ${collection.id}`);
-        }
-        // Cache collection ID for future use (avoiding repeated API calls)
-        this.collections.set(name, collection.id);
-        // Return collection object
-        return collection;
+      let collection;
+      // First try to get existing collection
+      try {
+        collection = await this.client.getCollection({
+          name,
+          embeddingFunction: this.embeddingFunction,
+        });
+        console.log(`Found collection: ${name} with ID: ${collection.id}`);
+      } catch (error) {
+        collection = await this.client.createCollection({
+          name,
+          embeddingFunction: this.embeddingFunction,
+        });
+        console.log(`Created collection: ${name} with ID: ${collection.id}`);
+      }
+      // Cache collection ID for future use (avoiding repeated API calls)
+      this.collections.set(name, collection.id);
+      // Return collection object
+      return collection;
     } catch (error) {
-        console.error('Error in getOrCreateCollection:', error);
-        throw error;
+      console.error("Error in getOrCreateCollection:", error);
+      throw error;
     }
   }
 
   async addDocuments(collectionName: string, documents: string[]) {
     try {
-        // Get or create collection
-        const collection = await this.getOrCreateCollection(collectionName);
-        console.log(`Using collection: ${collectionName} with ID: ${collection.id}`);
-        
-        // Split documents into batches
-        const BATCH_SIZE = 5; // Reduced further
-        
-        // Add documents in batches
-        for (let i = 0; i < documents.length; i += BATCH_SIZE) {
-            // Filter out empty or large documents
-            const batch = documents.slice(i, i + BATCH_SIZE);
-            // Filter out empty or large documents
-            const validBatch = batch.filter(doc => 
-                doc && 
-                doc.length > 0 && 
-                doc.length < 4000 // Reduced size limit 
+      const collection = await this.getOrCreateCollection(collectionName);
+      console.log(
+        `Using collection: ${collectionName} with ID: ${collection.id}`
+      );
+
+      // Pre-filter all documents
+      const validDocuments = documents.filter(
+        (doc) => doc && doc.length > 0 && doc.length < 4000
+      );
+
+      // Increased batch size
+      const BATCH_SIZE = 75;
+      const CONCURRENT_BATCHES = 8; // Number of concurrent requests
+
+      // Pre-generate IDs and metadata to reduce overhead
+      const timestamp = Date.now();
+      const allBatches = [];
+
+      for (let i = 0; i < validDocuments.length; i += BATCH_SIZE) {
+        const batchDocuments = validDocuments.slice(i, i + BATCH_SIZE);
+        const batchData = {
+          ids: batchDocuments.map((_, idx) => `doc_${timestamp}_${i + idx}`),
+          documents: batchDocuments,
+          metadatas: batchDocuments.map(() => ({ timestamp })),
+        };
+        allBatches.push(batchData);
+      }
+
+      // Process batches with controlled concurrency
+      const results = [];
+      for (let i = 0; i < allBatches.length; i += CONCURRENT_BATCHES) {
+        const batchPromises = allBatches
+          .slice(i, i + CONCURRENT_BATCHES)
+          .map(async (batchData, batchIndex) => {
+            const currentBatch = i + batchIndex + 1;
+            console.log(
+              `Processing batch ${currentBatch}/${allBatches.length}`
             );
 
-            // Add batch if not empty or large documents found in batch
-            if (validBatch.length > 0) {
-                // Prepare batch data with unique IDs and metadata for each document in batch
-                const batchData = {
-                    ids: validBatch.map((_, idx) => `doc_${Date.now()}_${i + idx}`),
-                    documents: validBatch,
-                    metadatas: validBatch.map(() => ({ timestamp: Date.now() })),
-                };
+            // Add exponential backoff retry logic
+            const maxRetries = 3;
+            let lastError;
+            for (let retry = 0; retry < maxRetries; retry++) {
+              try {
+                if (retry > 0) {
+                  const delay = Math.min(1000 * Math.pow(2, retry), 10000);
+                  await new Promise((resolve) => setTimeout(resolve, delay));
+                  console.log(`Retry ${retry + 1} for batch ${currentBatch}`);
+                }
 
-                // Add batch to collection
-                console.log(`Adding batch ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(documents.length/BATCH_SIZE)}`);
+                const startTime = Date.now();
                 await collection.add(batchData);
-                //await new Promise(resolve => setTimeout(resolve, 500)); // Increased delay
+                const duration = Date.now() - startTime;
+
+                console.log(`Batch ${currentBatch} completed in ${duration}ms`);
+                return { success: true, batch: currentBatch };
+              } catch (error) {
+                lastError = error;
+                if (retry === maxRetries - 1) throw error;
+              }
             }
-        }
+          });
+
+        // Wait for the current group of batches to complete
+        const batchResults = await Promise.all(batchPromises);
+        results.push(...batchResults);
+
+        // Optional: Add a small delay between batch groups to prevent overwhelming the server
+      }
+
+      const totalSuccess = results.filter((r) => r?.success).length;
+      console.log(
+        `Completed ${totalSuccess}/${allBatches.length} batches successfully`
+      );
     } catch (error) {
-        console.error("ChromaDB Add Error:", {
-            collectionName,
-            collectionId: this.collections.get(collectionName),
-            batchInfo: { total: documents.length, first: documents[0]?.length },
-            error: error instanceof Error ? error.stack : String(error)
-        });
-        throw error;
+      console.error("ChromaDB Add Error:", {
+        collectionName,
+        batchInfo: { total: documents.length, first: documents[0]?.length },
+        error: error instanceof Error ? error.stack : String(error),
+      });
+      throw error;
     }
   }
 
@@ -123,7 +165,7 @@ export class ChromaService {
       console.log(`Collection deleted: ${name}`);
       return true;
     } catch (error) {
-      console.error('Delete collection error:', error);
+      console.error("Delete collection error:", error);
       throw error;
     }
   }

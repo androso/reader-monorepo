@@ -12,7 +12,7 @@ import { unlink } from 'fs/promises';
 export class EPUBProcessor {
   // Define services
   private s3Service: S3Service;
-  public chromaService: ChromaService;
+  private chromaService: ChromaService;
   private openAIService: OpenAIService;
   private localFilePath: string;
 
@@ -123,6 +123,16 @@ export class EPUBProcessor {
       return true;
     } catch (error) {
       console.error('Error processing EPUB:', error);
+      return false;
+    }
+  }
+  //using chroma service to delete
+  async deleteCollection(name: string): Promise<boolean> {
+    try {
+      await this.chromaService.deleteCollection(name);
+      return true;
+    } catch (error) {
+      console.error('Delete collection error:', error);
       return false;
     }
   }
