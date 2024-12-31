@@ -24,29 +24,18 @@ export class QueryController {
     }
   }
 
-  async handleDelete(req: Request, res: Response<DeleteCollectionResponse>) {
+  async handleDelete(req: Request, res: Response) {
     try {
       const { collectionName } = req.params;
+      const success = await this.epubProcessor.deleteCollection(collectionName);
       
-      if (!collectionName) {
-        res.status(400).json({ 
-          success: false, 
-          error: 'Collection name is required' 
-        });
-        return;
+      if (success) {
+        res.status(200).json({ message: `Collection ${collectionName} deleted successfully` });
+      } else {
+        res.status(500).json({ error: 'Failed to delete collection' });
       }
-  
-      await this.epubProcessor.deleteCollection(collectionName);
-      
-      res.json({ 
-        success: true, 
-        message: `Collection ${collectionName} deleted successfully` 
-      });
     } catch (error) {
-      res.status(500).json({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      res.status(500).json({ error: 'Error deleting collection' });
     }
   }
 }
