@@ -9,3 +9,9 @@ export interface QueryResponse {
   source_documents?: string[];
   error?: string;
 }
+
+export interface DeleteCollectionResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}

@@ -126,6 +126,16 @@ export class EPUBProcessor {
       return false;
     }
   }
+  //using chroma service to delete
+  async deleteCollection(name: string): Promise<boolean> {
+    try {
+      await this.chromaService.deleteCollection(name);
+      return true;
+    } catch (error) {
+      console.error('Delete collection error:', error);
+      return false;
+    }
+  }
 
   // Process EPUB file and query ChromaDB collection
   async processAndQuery(

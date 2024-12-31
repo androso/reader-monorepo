@@ -15,6 +15,7 @@ app.get('/',
     }
 )
 app.post('/query', (req, res) => queryController.handleQuery(req, res));
+app.delete('/collection/:collectionName', queryController.handleDelete.bind(queryController));
 
 
 // const PORT = process.env.PORT || 3000;
