@@ -21,7 +21,7 @@ export class OpenAIService {
         { role: 'user', content: `Context:\n${context}\n\nQuestion: ${query}\n\nAnswer:` }
       ],
       temperature: 0.7,
-      max_tokens: 500
+      max_tokens: 700
     });
 
     return response.choices[0].message.content || '';
