@@ -15,13 +15,13 @@ export class OpenAIService {
   //generate response function to generate response from the model based on the context and query
   async generateResponse(context: string, query: string): Promise<string> {
     const response = await this.client.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: 'You are a helpful assistant. Answer the question based on the provided context.' },
         { role: 'user', content: `Context:\n${context}\n\nQuestion: ${query}\n\nAnswer:` }
       ],
       temperature: 0.7,
-      max_tokens: 500
+      max_tokens: 700
     });
 
     return response.choices[0].message.content || '';
@@ -34,7 +34,7 @@ export class OpenAIService {
     ).join('\n');
 
     const response = await this.client.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -54,7 +54,7 @@ DO NOT include any other text or explanations in your response.`
         }
       ],
       temperature: 0.2, // Lower temperature for more consistent responses
-      max_tokens: 100   // Reduced as we only need numbers
+      max_tokens: 200   // Reduced as we only need numbers
     });
 
     const result = response.choices[0].message.content || '';
