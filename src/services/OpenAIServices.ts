@@ -21,7 +21,7 @@ export class OpenAIService {
         { role: 'user', content: `Context:\n${context}\n\nQuestion: ${query}\n\nAnswer:` }
       ],
       temperature: 0.7,
-      max_tokens: 700
+      max_tokens: 400
     });
 
     return response.choices[0].message.content || '';
@@ -29,43 +29,53 @@ export class OpenAIService {
 
    // New method specifically for analyzing text chunks
    async analyzeChunks(chunks: string[]): Promise<number[]> {
-    const chunkedText = chunks.map((chunk, index) => 
-      `<|start_chunk_${index + 1}|>${chunk}<|end_chunk_${index + 1}|>`
-    ).join('\n');
-
-    const response = await this.client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a text analysis system that identifies natural semantic breaks in text.
-Your task is to analyze the provided chunks and determine where thematic breaks occur.
-You must respond ONLY with the chunk numbers where splits should occur, in the format:
-split_after: X, Y, Z
-
-Example response:
-split_after: 3, 7, 12
-
-DO NOT include any other text or explanations in your response.`
-        },
-        {
-          role: 'user',
-          content: chunkedText
-        }
-      ],
-      temperature: 0.2, // Lower temperature for more consistent responses
-      max_tokens: 200   // Reduced as we only need numbers
-    });
-
-    const result = response.choices[0].message.content || '';
+    console.log('[OpenAIService] Starting chunk analysis');
+    console.log(`[OpenAIService] Analyzing ${chunks.length} chunks`);
     
-    // Parse the response to extract numbers
-    const splitMatch = result.match(/split_after:\s*([\d,\s]+)/);
-    if (!splitMatch) return [];
-    
-    return splitMatch[1]
-      .split(',')
-      .map(num => parseInt(num.trim()))
-      .filter(num => !isNaN(num));
+    try {
+      if (!chunks.length) {
+        console.log('[OpenAIService] No chunks to analyze');
+        return [];
+      }
+      
+      const chunkedText = chunks.map((chunk, index) => 
+        `Chunk ${index + 1}:\n${chunk}\n---\n`
+      ).join('\n');
+
+      console.log('[OpenAIService] Sending request to OpenAI');
+      const response = await this.client.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `Analyze the following text chunks and identify natural semantic breaks...`
+          },
+          {
+            role: 'user',
+            content: chunkedText
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 200
+      });
+
+      console.log('[OpenAIService] Received response from OpenAI');
+      const result = response.choices[0]?.message?.content || '';
+      console.log(`[OpenAIService] Raw response: ${result}`);
+      
+      const splits = result.toLowerCase().includes('split_after:') 
+        ? result
+            .split('split_after:')[1]
+            .match(/\d+/g)
+            ?.map(num => parseInt(num))
+            .filter(num => !isNaN(num) && num <= chunks.length) || []
+        : [];
+      
+      console.log(`[OpenAIService] Parsed split points: ${splits.join(', ')}`);
+      return splits;
+    } catch (error) {
+      console.error('[OpenAIService] Error analyzing chunks:', error);
+      return [];
+    }
   }
 }
