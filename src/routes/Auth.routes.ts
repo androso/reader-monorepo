@@ -12,7 +12,8 @@ router.post("/google", async (req, res) => {
 		const user = await db
 			.select()
 			.from(Users)
-			.where(eq(Users.email, payload.email));
+			.where(eq(Users.googleId, payload.sub));
+
 		if (user.length === 0) {
 			await db.insert(Users).values({
 				googleId: payload.sub,
@@ -21,9 +22,9 @@ router.post("/google", async (req, res) => {
 				// picture: payload.picture
 			});
 		}
-		const jwtToken = generateToken(user);
 
-		res.json({ token: jwtToken, user });
+		const jwtToken = generateToken(user);
+		res.json({ token: jwtToken, user: user[0] });
 	} catch (e) {
 		console.error(e);
 		res.status(401).json({ message: "Authentication failed" });
