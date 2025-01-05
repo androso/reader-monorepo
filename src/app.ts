@@ -1,26 +1,40 @@
-import express from 'express';
-import { QueryController } from './controllers/QueryControllers';
-import dotenv from 'dotenv';
-
+import express from "express";
+import { QueryController } from "./controllers/QueryControllers";
+import dotenv from "dotenv";
+import authRoutes from "./routes/Auth.routes";
+import userRoutes from "./routes/User.routes";
+import cors from "cors";
 dotenv.config();
 
 const app = express();
+if (!process.env.FRONTEND_URL) {
+	console.warn("FRONTEND_URL not set, CORS is not enabled");
+}
+
+app.use(
+	cors({
+		origin: process.env.FRONTEND_URL || false,
+		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+		credentials: true,
+	})
+);
+
 app.use(express.json());
-//app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
-const queryController = new QueryController(process.env.DO_SPACES_NAME || '');
-app.get('/', 
-    (req, res) => {
-        res.send('Hello World');
-    }
-)
-app.post('/query', (req, res) => queryController.handleQuery(req, res));
-app.delete('/collection/:collectionName', queryController.handleDelete.bind(queryController));
+const queryController = new QueryController(process.env.DO_SPACES_NAME || "");
+app.get("/", (req, res) => {
+	res.send("Hello World");
+});
+app.post("/query", (req, res) => queryController.handleQuery(req, res));
+app.delete(
+	"/collection/:collectionName",
+	queryController.handleDelete.bind(queryController)
+);
 
-
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
+// auth routes
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 
 export default app;
