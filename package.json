@@ -23,6 +23,7 @@
     "chromadb": "^1.9.4",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.30.1",
     "drizzle-orm": "^0.38.3",
     "epub": "^1.2.1",
     "express": "^4.21.2",
