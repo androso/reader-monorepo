@@ -21,6 +21,11 @@ router.post("/google", async (req, res) => {
 				name: payload.name,
 				// picture: payload.picture
 			});
+		} else {
+			await db
+				.update(Users)
+				.set({ updatedAt: new Date() })
+				.where(eq(Users.googleId, payload.sub));
 		}
 
 		const jwtToken = generateToken(user);
