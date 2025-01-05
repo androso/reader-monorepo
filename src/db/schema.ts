@@ -12,5 +12,15 @@ export const Users = pgTable("users", {
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const Books = pgTable("books", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: text("title").notNull(),
+    userId: uuid("user_id").references(() => Users.id).notNull(),
+    fileKey: text("file_key").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type InsertUser = typeof Users.$inferInsert;
 export type SelectUser = typeof Users.$inferSelect;
+export type InsertBook = typeof Books.$inferInsert;
+export type SelectBook = typeof Books.$inferSelect;
