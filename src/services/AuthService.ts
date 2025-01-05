@@ -44,7 +44,7 @@ export const verifyGoogleToken = async (token: string) => {
 	}
 };
 
-export const generateToken = async (user: any) => {
+export const generateToken = (user: any) => {
 	return jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
 		expiresIn: "7d",
 	});
