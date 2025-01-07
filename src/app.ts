@@ -3,9 +3,11 @@ import { QueryController } from "./controllers/QueryControllers";
 import dotenv from "dotenv";
 import authRoutes from "./routes/Auth.routes";
 import userRoutes from "./routes/User.routes";
+import bookRoutes from "./routes/Book.routes";
 import cors from "cors";
 import { logger } from "./middleware/logger";
 dotenv.config();
+import { authenticate } from "./middleware/auth";
 
 const app = express();
 if (!process.env.FRONTEND_URL) {
@@ -38,5 +40,5 @@ app.delete(
 // auth routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-
+app.use("/api/books", bookRoutes)
 export default app;
