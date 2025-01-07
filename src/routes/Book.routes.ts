@@ -1,7 +1,7 @@
 import { Router } from "express";
 const router = Router();
 import multer from "multer";
-import { uploadFile } from "../utils/storage";
+import { getFile, uploadFile } from "../utils/storage";
 import { authenticate } from "../middleware/auth";
 import { db } from "../db";
 import { books } from "../../migrations/schema";
@@ -52,11 +52,28 @@ router.post("/", authenticate, upload.single("file"), async (req, res) => {
 });
 
 router.get("/", authenticate, async (req, res) => {
-    const booksList = await db.select().from(books).where(eq(books.userId, req.user.id));
+    const booksList = await db
+        .select()
+        .from(books)
+        .where(eq(books.userId, req.user.id));
 
     return res.json({
-        books: booksList
-    })
-})
+        books: booksList,
+    });
+});
+
+router.get("/:id", authenticate, async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const fileBuffer = await getFile(id) 
+        res.type('application/octet-stream');
+        res.send(fileBuffer)
+        
+    } catch(er) {
+        console.error("Error fetching file", er) 
+        res.status(500).json({ error: "Internal server error"});
+    }
+});
 
 export default router;
