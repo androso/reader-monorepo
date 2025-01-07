@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/Auth.routes";
 import userRoutes from "./routes/User.routes";
 import cors from "cors";
+import { logger } from "./middleware/logger";
 dotenv.config();
 
 const app = express();
@@ -17,11 +18,12 @@ app.use(
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 		allowedHeaders: ["Content-Type", "Authorization"],
 		credentials: true,
-	})
+	}),
 );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(logger);
 
 const queryController = new QueryController(process.env.DO_SPACES_NAME || "");
 app.get("/", (req, res) => {
@@ -30,7 +32,7 @@ app.get("/", (req, res) => {
 app.post("/query", (req, res) => queryController.handleQuery(req, res));
 app.delete(
 	"/collection/:collectionName",
-	queryController.handleDelete.bind(queryController)
+	queryController.handleDelete.bind(queryController),
 );
 
 // auth routes
