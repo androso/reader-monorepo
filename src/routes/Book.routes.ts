@@ -5,6 +5,7 @@ import { uploadFile } from "../utils/storage";
 import { authenticate } from "../middleware/auth";
 import { db } from "../db";
 import { books } from "../../migrations/schema";
+import { eq } from "drizzle-orm";
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -49,5 +50,13 @@ router.post("/", authenticate, upload.single("file"), async (req, res) => {
         );
     }
 });
+
+router.get("/", authenticate, async (req, res) => {
+    const booksList = await db.select().from(books).where(eq(books.userId, req.user.id));
+
+    return res.json({
+        books: booksList
+    })
+})
 
 export default router;
