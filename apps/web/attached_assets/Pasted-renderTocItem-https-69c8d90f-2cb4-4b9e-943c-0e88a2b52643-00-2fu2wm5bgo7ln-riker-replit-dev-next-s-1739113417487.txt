@@ -1,0 +1,16 @@
+renderTocItem@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/src_5524fa._.js:42:137
+[project]/src/components/reader/Sidebar.tsx [app-client] (ecmascript)/_c</<.children<.children<.children<.children<@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/src_5524fa._.js:115:84
+[project]/src/components/reader/Sidebar.tsx [app-client] (ecmascript)/_c<@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/src_5524fa._.js:115:51
+react-stack-bottom-frame@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:13403:24
+renderWithHooks@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:2977:42
+updateFunctionComponent@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:4732:21
+updateSimpleMemoComponent@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:4675:16
+updateMemoComponent@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:4650:302
+beginWork@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:5433:24
+runWithFiberInDEV@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:631:20
+performUnitOfWork@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:7955:97
+workLoopSync@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:7847:57
+renderRootSync@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:7830:13
+performWorkOnRoot@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:7589:56
+performWorkOnRootViaSchedulerTask@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_react-dom_35da01._.js:8394:26
+performWorkUntilDeadline@https://69c8d90f-2cb4-4b9e-943c-0e88a2b52643-00-2fu2wm5bgo7ln.riker.replit.dev/_next/static/chunks/53a17_next_dist_compiled_e110bc._.js:2353:72
