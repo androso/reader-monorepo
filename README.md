@@ -1,5 +1,4 @@
 # Reader Platform
-
 [![CI](https://github.com/androso/reader-monorepo/actions/workflows/ci.yml/badge.svg)](https://github.com/androso/reader-monorepo/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/androso/reader-monorepo/actions/workflows/codeql.yml/badge.svg)](https://github.com/androso/reader-monorepo/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
